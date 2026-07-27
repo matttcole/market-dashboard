@@ -1,30 +1,9 @@
 """
 ingest_inflation_with_history.py
 
-Persistent inflation data ingest for GitHub Actions.
-
-On each run:
-  1. Read inflation_history.json (accumulated data in repo)
-  2. Fetch latest FRED inflation series
-  3. Merge new observations (no duplicates by obs_date + series_key)
-  4. Commit updated history back to repo
-  5. Return YoY rates for snapshot.json
-
-This solves the "database doesn't persist between Actions runs" problem by
-storing history as a JSON file in the repo itself.
-
-Usage:
-  python ingest_inflation_with_history.py --fred-key $FRED_API_KEY
-  
-  Outputs to stdout a JSON dict with:
-  {
-    "inflation_data": { "series_key": { "obs_date": value, ... }, ... },
-    "yoy_rates": { "series_key": 2.57, ... },
-    "updated_count": 3
-  }
+Persistent inflation data ingest.
+Fetches latest FRED inflation data, merges with history, calculates YoY rates.
 """
-
-from __future__ import annotations
 
 import argparse
 import datetime as dt
@@ -41,11 +20,10 @@ except ImportError:
 
 
 INFLATION_SERIES = {
-    "PCEPILFE": "us.pce.core",
-    "PCEPI": "us.pce.headline",
-    "CPILFESL": "us.cpi.core",
-    "CPIAUCSL": "us.cpi.headline",
-    "CPALSL": "ca.cpi.headline",
+    "PCEPILFE": "us.inflation.pce.core",
+    "PCEPI": "us.inflation.pce",
+    "CPILFESL": "us.inflation.cpi.core",
+    "CPIAUCSL": "us.inflation.cpi",
 }
 
 HISTORY_FILE = Path("inflation_history.json")
@@ -59,7 +37,7 @@ def fetch_fred_series(series_id: str, api_key: str) -> list[dict[str, Any]]:
         "api_key": api_key,
         "file_type": "json",
         "sort_order": "asc",
-        "limit": 120000,
+        "limit": 10000,
     }
     r = requests.get(url, params=params, timeout=30)
     r.raise_for_status()
@@ -72,13 +50,8 @@ def load_history() -> dict[str, Any]:
         with open(HISTORY_FILE) as f:
             return json.load(f)
     return {
-        "description": "Raw FRED inflation observations. Append new points; never delete. Used to calculate YoY rates.",
-        "schema": {
-            "series_key": "unique identifier (e.g., 'us.cpi.core')",
-            "obs_date": "YYYY-MM-DD, the period the observation describes",
-            "value": "raw series value (e.g., 336.06 for CPI index)",
-            "fetched_at": "ISO 8601 timestamp when this was pulled from FRED"
-        },
+        "description": "Raw FRED inflation observations.",
+        "schema": {},
         "observations": [],
     }
 
@@ -89,11 +62,7 @@ def merge_observations(
     series_key: str,
     fred_obs: list[dict[str, Any]],
 ) -> int:
-    """
-    Merge FRED observations into history.
-    Returns count of new observations added.
-    Skips duplicates (by obs_date + series_key).
-    """
+    """Merge FRED observations into history. Returns count of new observations added."""
     existing_keys = {
         (o["series_key"], o["obs_date"])
         for o in history["observations"]
@@ -126,14 +95,8 @@ def merge_observations(
     return added
 
 
-def calculate_yoy_rates(history: dict[str, Any]) -> dict[str, float]:
-    """
-    Calculate YoY inflation rates.
-    
-    Finds the most recent observation for each series, then looks back
-    12 months and calculates (current / prior) - 1.
-    Returns latest rate as percentage (e.g., 2.57 for 2.57%).
-    """
+def calculate_yoy_rates(history: dict[str, Any]) -> dict[str, dict]:
+    """Calculate YoY inflation rates."""
     by_series: dict[str, list[dict[str, Any]]] = {}
     for obs in history["observations"]:
         if obs["series_key"] not in by_series:
@@ -159,23 +122,13 @@ def calculate_yoy_rates(history: dict[str, Any]) -> dict[str, float]:
         
         if prior and prior["value"] > 0:
             yoy = ((latest["value"] / prior["value"]) - 1) * 100
-            rates[series_key] = round(yoy, 2)
+            rates[series_key] = {
+                "rate": round(yoy, 2),
+                "current_date": latest["obs_date"],
+                "prior_date": prior["obs_date"],
+            }
     
     return rates
-
-
-def commit_to_repo(updated_count: int) -> None:
-    """
-    Stage and commit the updated inflation_history.json to the repo.
-    Requires git to be configured (automatic in GitHub Actions).
-    """
-    if updated_count == 0:
-        return
-    
-    os.system("git add inflation_history.json")
-    os.system(
-        f'git commit -m "chore: update inflation history (+{updated_count} obs)"'
-    )
 
 
 def main() -> int:
@@ -193,9 +146,9 @@ def main() -> int:
             fred_obs = fetch_fred_series(series_id, args.fred_key)
             added = merge_observations(history, series_id, series_key, fred_obs)
             total_added += added
-            print(f"  {series_key:<20} +{added:2d} observations", file=sys.stderr)
+            print(f"  {series_key:<30} +{added:2d} observations", file=sys.stderr)
         except Exception as e:
-            print(f"  {series_key:<20} ERROR: {e}", file=sys.stderr)
+            print(f"  {series_key:<30} ERROR: {e}", file=sys.stderr)
     
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=2)
@@ -204,20 +157,13 @@ def main() -> int:
     
     if total_added > 0 and not args.no_commit:
         try:
-            commit_to_repo(total_added)
+            os.system("git add inflation_history.json")
+            os.system(f'git commit -m "chore: update inflation history (+{total_added} obs)"')
             print(f"✓ Committed {total_added} new observations", file=sys.stderr)
         except Exception as e:
             print(f"⚠ Commit failed (non-fatal): {e}", file=sys.stderr)
     
     result = {
-        "inflation_data": {
-            series_key: {
-                o["obs_date"]: o["value"]
-                for o in history["observations"]
-                if o["series_key"] == series_key
-            }
-            for series_key in INFLATION_SERIES.values()
-        },
         "yoy_rates": yoy_rates,
         "updated_count": total_added,
     }
