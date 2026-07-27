@@ -2,7 +2,7 @@
 ingest_inflation_with_history.py
 
 Persistent inflation data ingest.
-Fetches latest FRED inflation data, merges with history, calculates YoY rates.
+Fetches latest FRED inflation data (US only), merges with history, calculates YoY rates.
 """
 
 import argparse
@@ -50,7 +50,7 @@ def load_history() -> dict[str, Any]:
         with open(HISTORY_FILE) as f:
             return json.load(f)
     return {
-        "description": "Raw FRED inflation observations.",
+        "description": "Raw inflation observations.",
         "schema": {},
         "observations": [],
     }

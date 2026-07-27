@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated_at": "2026-07-27T18:25:13.599990",
+    "generated_at": "2026-07-27T18:30:45.367922",
     "series_count": 35,
     "observations_count": 35
   },
@@ -112,6 +112,11 @@
     }
   },
   "yoy_rates": {
+    "ca.inflation.cpi": {
+      "rate": 2.49,
+      "current_date": "2026-06-01",
+      "prior_date": "2025-07-01"
+    },
     "us.inflation.cpi": {
       "rate": 3.23,
       "current_date": "2026-06-01",

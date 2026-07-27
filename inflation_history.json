@@ -8,6 +8,150 @@
   },
   "observations": [
     {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-07-01",
+      "value": 162.1,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-08-01",
+      "value": 161.8,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-09-01",
+      "value": 161.1,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-10-01",
+      "value": 161.8,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-11-01",
+      "value": 161.8,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2024-12-01",
+      "value": 161.2,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-01-01",
+      "value": 161.3,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-02-01",
+      "value": 163.0,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-03-01",
+      "value": 163.5,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-04-01",
+      "value": 163.4,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-05-01",
+      "value": 164.3,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-06-01",
+      "value": 164.4,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-07-01",
+      "value": 164.9,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-08-01",
+      "value": 164.8,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-09-01",
+      "value": 164.9,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-10-01",
+      "value": 165.3,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-11-01",
+      "value": 165.4,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2025-12-01",
+      "value": 165.0,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-01-01",
+      "value": 165.0,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-02-01",
+      "value": 165.9,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-03-01",
+      "value": 167.4,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-04-01",
+      "value": 168.0,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-05-01",
+      "value": 169.6,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
+      "series_key": "ca.inflation.cpi",
+      "obs_date": "2026-06-01",
+      "value": 169.0,
+      "fetched_at": "2026-07-27T21:00:28.750233Z"
+    },
+    {
       "series_key": "us.inflation.cpi",
       "obs_date": "1947-01-01",
       "value": 21.48,
