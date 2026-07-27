@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header .meta {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .tile {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        
+        .tile:hover {
+            border-color: #555;
+            background: #222;
+        }
+        
+        .tile-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .tile-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-family: "Monaco", "Courier New", monospace;
+        }
+        
+        .tile-date {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Category-specific colors */
+        .rates .tile-value { color: #64b5f6; }
+        .inflation .tile-value { color: #ff6b6b; }
+        .labour .tile-value { color: #51cf66; }
+        .growth .tile-value { color: #ffa94d; }
+        .crypto .tile-value { color: #f0ad4e; }
+        .fx .tile-value { color: #9575cd; }
+        .sentiment .tile-value { color: #ef5350; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #2a1a1a;
+            border: 1px solid #8b4545;
+            color: #ff8a8a;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Market Dashboard</h1>
+        <div class="meta">
+            <span id="lastUpdated">Loading...</span>
+        </div>
+    </div>
+    
+    <div class="container" id="dashboard">
+        <div class="loading">Loading data...</div>
+    </div>
+    
+    <script>
+        const SERIES_LABELS = {
+            // US Rates
+            "us.rate.fed.upper": "Fed Rate (Upper)",
+            "us.rate.fed.lower": "Fed Rate (Lower)",
+            "us.rate.effr": "EFFR",
+            "us.rate.sofr": "SOFR",
+            "us.rate.2y": "US 2Y",
+            "us.rate.5y": "US 5Y",
+            "us.rate.10y": "US 10Y",
+            "us.rate.30y": "US 30Y",
+            "us.spread.2s10s": "US 2s10s Spread",
+            "us.spread.3m10y": "US 3m10y Spread",
+            
+            // US Inflation
+            "us.inflation.pce": "US PCE",
+            "us.inflation.pce.core": "US Core PCE",
+            "us.inflation.cpi": "US CPI",
+            "us.inflation.cpi.core": "US Core CPI",
+            "us.inflation.5y5y_fwd": "US 5y5y Forward",
+            
+            // US Labour
+            "us.labour.unemployment": "US Unemployment",
+            "us.labour.payrolls": "US Payrolls",
+            "us.labour.initial_claims": "Initial Claims",
+            
+            // US Growth
+            "us.growth.gdp_real": "US Real GDP",
+            "us.growth.gdp_nowcast": "US GDP Nowcast",
+            
+            // Canada
+            "ca.fx.usdcad": "USD/CAD",
+            "ca.rate.2y": "Canada 2Y",
+            "ca.rate.5y": "Canada 5Y",
+            "ca.rate.10y": "Canada 10Y",
+            "ca.rate.corra": "CORRA",
+            "ca.rate.policy": "BoC Policy",
+            "ca.inflation.cpi": "Canada CPI",
+            
+            // Crypto
+            "btc.price.usd": "BTC",
+            "btc.price.cad": "BTC (CAD)",
+            "eth.price.usd": "ETH",
+            "eth.price.cad": "ETH (CAD)",
+            "crypto.mcap.usd": "Crypto Market Cap",
+            "btc.dominance": "BTC Dominance",
+            "stablecoin.supply.usd": "Stablecoin Supply",
+            "fear.greed.index": "Fear & Greed",
+        };
+        
+        const CATEGORIES = {
+            rates: ["us.rate", "ca.rate"],
+            inflation: ["us.inflation", "ca.inflation"],
+            labour: ["us.labour"],
+            growth: ["us.growth"],
+            fx: ["ca.fx"],
+            crypto: ["btc", "eth", "crypto", "stablecoin", "fear.greed"],
+        };
+        
+        function categorizeSeriesKey(key) {
+            for (const [category, patterns] of Object.entries(CATEGORIES)) {
+                for (const pattern of patterns) {
+                    if (key.includes(pattern)) return category;
+                }
+            }
+            return "other";
+        }
+        
+        function formatValue(series_key, value) {
+            if (series_key.includes("price")) {
+                return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+            }
+            if (series_key.includes("mcap") || series_key.includes("supply")) {
+                return `$${(value / 1e12).toLocaleString("en-US", { maximumFractionDigits: 2 })}T`;
+            }
+            if (series_key.includes("dominance") || series_key.includes("greed")) {
+                return `${value.toFixed(1)}%`;
+            }
+            if (series_key.includes("inflation") || series_key.includes("rate") || series_key.includes("spread")) {
+                return `${value.toFixed(2)}%`;
+            }
+            if (series_key.includes("unemployment")) {
+                return `${value.toFixed(1)}%`;
+            }
+            if (series_key.includes("payrolls") || series_key.includes("claims")) {
+                return `${(value / 1000).toLocaleString("en-US", { maximumFractionDigits: 0 })}k`;
+            }
+            if (series_key.includes("gdp")) {
+                return `${value.toFixed(2)}%`;
+            }
+            return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
+        }
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch("snapshot.json");
+                const data = await response.json();
+                
+                // Update timestamp
+                document.getElementById("lastUpdated").textContent = 
+                    `Last updated: ${new Date(data._meta.generated_at).toLocaleString()}`;
+                
+                // Group by category
+                const grouped = {};
+                for (const [series_key, observations] of Object.entries(data.data)) {
+                    const category = categorizeSeriesKey(series_key);
+                    if (!grouped[category]) grouped[category] = [];
+                    
+                    // Get latest observation
+                    const dates = Object.keys(observations).sort().reverse();
+                    if (dates.length > 0) {
+                        const latest_date = dates[0];
+                        const latest_value = observations[latest_date];
+                        grouped[category].push({
+                            series_key,
+                            label: SERIES_LABELS[series_key] || series_key,
+                            value: latest_value,
+                            obs_date: latest_date,
+                        });
+                    }
+                }
+                
+                // Render
+                let html = "";
+                const categoryOrder = ["rates", "inflation", "labour", "growth", "fx", "crypto"];
+                
+                for (const category of categoryOrder) {
+                    if (!grouped[category] || grouped[category].length === 0) continue;
+                    
+                    const tiles = grouped[category]
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .map(d => `
+                            <div class="tile">
+                                <div class="tile-label">${d.label}</div>
+                                <div class="tile-value">${formatValue(d.series_key, d.value)}</div>
+                                <div class="tile-date">as of ${d.obs_date}</div>
+                            </div>
+                        `)
+                        .join("");
+                    
+                    html += `
+                        <div class="section ${category}">
+                            <div class="section-title">${category}</div>
+                            <div class="grid">${tiles}</div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById("dashboard").innerHTML = html;
+                
+            } catch (error) {
+                document.getElementById("dashboard").innerHTML = 
+                    `<div class="error">Error loading dashboard: ${error.message}</div>`;
+            }
+        }
+        
+        loadDashboard();
+    </script>
+</body>
+</html>
