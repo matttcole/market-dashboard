@@ -1,17 +1,17 @@
 """
 generate_snapshot.py — Export database to snapshot.json for the frontend.
 
-Reads YoY inflation rates from inflation_output.json (persistent historical data)
-instead of relying on the database.
+Reads YoY inflation rates from inflation_history.json (persistent historical data)
 """
 
 import sqlite3
 import json
 import datetime as dt
-import re
+from pathlib import Path
 
 DB = "market.db"
 SNAPSHOT = "snapshot.json"
+HISTORY_FILE = Path("inflation_history.json")
 
 INFLATION_SERIES = [
     "ca.inflation.cpi",
@@ -21,14 +21,47 @@ INFLATION_SERIES = [
     "us.inflation.pce.core",
 ]
 
-def load_inflation_yoy():
-    """Load YoY rates from inflation_output.json (created by ingest_inflation_with_history.py)."""
-    try:
-        with open("inflation_output.json") as f:
-            data = json.load(f)
-            return data.get("yoy_rates", {})
-    except FileNotFoundError:
+def calculate_yoy_from_history() -> dict:
+    """Calculate YoY rates from inflation_history.json"""
+    if not HISTORY_FILE.exists():
         return {}
+    
+    with open(HISTORY_FILE) as f:
+        history = json.load(f)
+    
+    by_series = {}
+    for obs in history.get("observations", []):
+        series_key = obs["series_key"]
+        if series_key not in by_series:
+            by_series[series_key] = []
+        by_series[series_key].append(obs)
+    
+    rates = {}
+    for series_key, obs_list in by_series.items():
+        if len(obs_list) < 2:
+            continue
+        
+        latest = obs_list[-1]
+        latest_date = dt.datetime.strptime(latest["obs_date"], "%Y-%m-%d")
+        
+        target_date = latest_date - dt.timedelta(days=365)
+        
+        prior = None
+        for obs in reversed(obs_list[:-1]):
+            obs_dt = dt.datetime.strptime(obs["obs_date"], "%Y-%m-%d")
+            if abs((obs_dt - target_date).days) <= 30:
+                prior = obs
+                break
+        
+        if prior and prior["value"] > 0:
+            yoy = ((latest["value"] / prior["value"]) - 1) * 100
+            rates[series_key] = {
+                "rate": round(yoy, 2),
+                "current_date": latest["obs_date"],
+                "prior_date": prior["obs_date"],
+            }
+    
+    return rates
 
 def main():
     conn = sqlite3.connect(DB)
@@ -75,8 +108,8 @@ def main():
             values_by_date = {date: value for date, value in rows}
             snapshot[series_key] = values_by_date
     
-    # Load YoY rates from persistent inflation history
-    yoy_rates = load_inflation_yoy()
+    # Calculate YoY rates from inflation_history.json
+    yoy_rates = calculate_yoy_from_history()
     
     cursor.execute("""
         SELECT outcome, probability
@@ -134,7 +167,7 @@ def main():
     print(f"✓ Generated {SNAPSHOT}")
     print(f"  {metadata['series_count']} series")
     print(f"  {metadata['observations_count']} observations total")
-    print(f"  {len(yoy_rates)} YoY inflation rates loaded from persistent history")
+    print(f"  {len(yoy_rates)} YoY inflation rates loaded")
     if boc_consensus:
         print(f"  BoC Consensus: {boc_consensus['outcome'].upper()} ({boc_consensus['probability']:.1%})")
     if fed_consensus:
