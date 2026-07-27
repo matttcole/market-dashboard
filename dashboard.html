@@ -143,6 +143,7 @@
         .crypto .tile-value { color: #f0ad4e; }
         .fx .tile-value { color: #9575cd; }
         .sentiment .tile-value { color: #ef5350; }
+        .policy .tile-value { color: #a78bfa; }
         
         .loading {
             text-align: center;
@@ -172,7 +173,7 @@
             <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="policy-btn cme-btn">
                 Fed Probabilities →
             </a>
-            <a href="https://tradingeconomics.com/canada/central-bank-interest-rate" target="_blank" class="policy-btn boc-btn">
+            <a href="https://www.m-x.ca/en/trading/tools/canadian-interest-rate-expectations" target="_blank" class="policy-btn boc-btn">
                 BoC Expectations →
             </a>
         </div>
@@ -233,6 +234,7 @@
         };
         
         const CATEGORIES = {
+            policy: ["policy"],
             rates: ["us.rate", "ca.rate"],
             inflation: ["us.inflation", "ca.inflation"],
             labour: ["us.labour"],
@@ -240,15 +242,6 @@
             fx: ["ca.fx"],
             crypto: ["btc", "eth", "crypto", "stablecoin", "fear.greed"],
         };
-        
-        function categorizeSeriesKey(key) {
-            for (const [category, patterns] of Object.entries(CATEGORIES)) {
-                for (const pattern of patterns) {
-                    if (key.includes(pattern)) return category;
-                }
-            }
-            return "other";
-        }
         
         function formatValue(series_key, value) {
             if (series_key.includes("price")) {
@@ -286,40 +279,69 @@
                 
                 // Group by category
                 const grouped = {};
+                
+                // Add BoC consensus to policy section
+                if (data.boc_consensus && data.boc_consensus.outcome) {
+                    grouped.policy = [{
+                        series_key: "boc.consensus",
+                        label: "BoC Next Decision",
+                        value: data.boc_consensus.outcome.toUpperCase(),
+                        value_pct: (data.boc_consensus.probability * 100).toFixed(1),
+                        obs_date: "Market Consensus",
+                    }];
+                }
+                
                 for (const [series_key, observations] of Object.entries(data.data)) {
-                    const category = categorizeSeriesKey(series_key);
-                    if (!grouped[category]) grouped[category] = [];
-                    
-                    // Get latest observation
-                    const dates = Object.keys(observations).sort().reverse();
-                    if (dates.length > 0) {
-                        const latest_date = dates[0];
-                        const latest_value = observations[latest_date];
-                        grouped[category].push({
-                            series_key,
-                            label: SERIES_LABELS[series_key] || series_key,
-                            value: latest_value,
-                            obs_date: latest_date,
-                        });
+                    for (const [cat, patterns] of Object.entries(CATEGORIES)) {
+                        for (const pattern of patterns) {
+                            if (series_key.includes(pattern)) {
+                                if (!grouped[cat]) grouped[cat] = [];
+                                
+                                const dates = Object.keys(observations).sort().reverse();
+                                if (dates.length > 0) {
+                                    const latest_date = dates[0];
+                                    const latest_value = observations[latest_date];
+                                    grouped[cat].push({
+                                        series_key,
+                                        label: SERIES_LABELS[series_key] || series_key,
+                                        value: latest_value,
+                                        obs_date: latest_date,
+                                    });
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
                 
                 // Render
                 let html = "";
-                const categoryOrder = ["rates", "inflation", "labour", "growth", "fx", "crypto"];
+                const categoryOrder = ["policy", "rates", "inflation", "labour", "growth", "fx", "crypto"];
                 
                 for (const category of categoryOrder) {
                     if (!grouped[category] || grouped[category].length === 0) continue;
                     
                     const tiles = grouped[category]
                         .sort((a, b) => a.label.localeCompare(b.label))
-                        .map(d => `
-                            <div class="tile">
-                                <div class="tile-label">${d.label}</div>
-                                <div class="tile-value">${formatValue(d.series_key, d.value)}</div>
-                                <div class="tile-date">as of ${d.obs_date}</div>
-                            </div>
-                        `)
+                        .map(d => {
+                            if (d.value_pct) {
+                                // BoC consensus tile
+                                return `
+                                    <div class="tile">
+                                        <div class="tile-label">${d.label}</div>
+                                        <div class="tile-value">${d.value}</div>
+                                        <div class="tile-date">${d.value_pct}% confidence</div>
+                                    </div>
+                                `;
+                            }
+                            return `
+                                <div class="tile">
+                                    <div class="tile-label">${d.label}</div>
+                                    <div class="tile-value">${formatValue(d.series_key, d.value)}</div>
+                                    <div class="tile-date">as of ${d.obs_date}</div>
+                                </div>
+                            `;
+                        })
                         .join("");
                     
                     html += `

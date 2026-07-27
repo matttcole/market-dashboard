@@ -34,6 +34,24 @@ def main():
             snapshot[series_key] = {}
         snapshot[series_key][obs_date] = value
     
+    # Add latest BoC consensus
+    cursor.execute("""
+        SELECT outcome, probability
+        FROM rate_probabilities
+        WHERE central_bank = 'BOC'
+        ORDER BY asof_date DESC, meeting_date ASC
+        LIMIT 1
+    """)
+    
+    boc_result = cursor.fetchone()
+    boc_consensus = {}
+    if boc_result:
+        outcome, prob = boc_result
+        boc_consensus = {
+            "outcome": outcome,
+            "probability": prob
+        }
+    
     # Add metadata
     metadata = {
         "generated_at": dt.datetime.now().isoformat(),
@@ -44,6 +62,7 @@ def main():
     output = {
         "_meta": metadata,
         "data": snapshot,
+        "boc_consensus": boc_consensus,
     }
     
     with open(SNAPSHOT, "w") as f:
@@ -54,7 +73,8 @@ def main():
     print(f"✓ Generated {SNAPSHOT}")
     print(f"  {metadata['series_count']} series")
     print(f"  {metadata['observations_count']} observations total")
-    print(f"  Generated at {metadata['generated_at']}")
+    if boc_consensus:
+        print(f"  BoC Consensus: {boc_consensus['outcome'].upper()} ({boc_consensus['probability']:.1%})")
 
 if __name__ == "__main__":
     main()
