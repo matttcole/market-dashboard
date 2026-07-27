@@ -223,9 +223,7 @@
         };
         
         function categorizeSeriesKey(key) {
-            // Don't categorize ca.rate.policy as "policy" - it goes in rates
             if (key === "ca.rate.policy") return "rates";
-            
             if (key.includes("us.rate") || key.includes("ca.rate")) return "rates";
             if (key.includes("us.inflation") || key.includes("ca.inflation")) return "inflation";
             if (key.includes("us.labour")) return "labour";
@@ -270,15 +268,31 @@
                 
                 const grouped = {};
                 
-                // Add BoC consensus to policy section ONLY if it exists
+                // Add Fed and BoC consensus to policy section
+                const policyTiles = [];
+                
+                if (data.fed_consensus && data.fed_consensus.outcome) {
+                    policyTiles.push({
+                        series_key: "fed.consensus",
+                        label: "Fed Next Decision",
+                        value: data.fed_consensus.outcome.toUpperCase(),
+                        value_pct: (data.fed_consensus.probability * 100).toFixed(1),
+                        obs_date: "Market Consensus",
+                    });
+                }
+                
                 if (data.boc_consensus && data.boc_consensus.outcome) {
-                    grouped.policy = [{
+                    policyTiles.push({
                         series_key: "boc.consensus",
                         label: "BoC Next Decision",
                         value: data.boc_consensus.outcome.toUpperCase(),
                         value_pct: (data.boc_consensus.probability * 100).toFixed(1),
                         obs_date: "Market Consensus",
-                    }];
+                    });
+                }
+                
+                if (policyTiles.length > 0) {
+                    grouped.policy = policyTiles;
                 }
                 
                 // Add observations
@@ -310,7 +324,6 @@
                         .sort((a, b) => a.label.localeCompare(b.label))
                         .map(d => {
                             if (d.value_pct) {
-                                // BoC consensus tile
                                 return `
                                     <div class="tile">
                                         <div class="tile-label">${d.label}</div>

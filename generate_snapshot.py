@@ -52,6 +52,24 @@ def main():
             "probability": prob
         }
     
+    # Add latest Fed consensus
+    cursor.execute("""
+        SELECT outcome, probability
+        FROM rate_probabilities
+        WHERE central_bank = 'FED'
+        ORDER BY asof_date DESC, meeting_date ASC
+        LIMIT 1
+    """)
+    
+    fed_result = cursor.fetchone()
+    fed_consensus = {}
+    if fed_result:
+        outcome, prob = fed_result
+        fed_consensus = {
+            "outcome": outcome,
+            "probability": prob
+        }
+    
     # Add metadata
     metadata = {
         "generated_at": dt.datetime.now().isoformat(),
@@ -63,6 +81,7 @@ def main():
         "_meta": metadata,
         "data": snapshot,
         "boc_consensus": boc_consensus,
+        "fed_consensus": fed_consensus,
     }
     
     with open(SNAPSHOT, "w") as f:
@@ -75,6 +94,8 @@ def main():
     print(f"  {metadata['observations_count']} observations total")
     if boc_consensus:
         print(f"  BoC Consensus: {boc_consensus['outcome'].upper()} ({boc_consensus['probability']:.1%})")
+    if fed_consensus:
+        print(f"  Fed Consensus: {fed_consensus['outcome'].upper()} ({fed_consensus['probability']:.1%})")
 
 if __name__ == "__main__":
     main()
