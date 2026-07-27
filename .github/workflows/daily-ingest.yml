@@ -2,9 +2,8 @@ name: Daily Market Data Ingest
 
 on:
   schedule:
-    # Run every day at 6 AM UTC (2 AM ET / 1 AM PT)
     - cron: '0 6 * * *'
-  workflow_dispatch:  # Allow manual runs
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,10 +23,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
       
-      - name: Remove old database
-        run: rm -f market.db
-      
-      - name: Create rate_probabilities table
+      - name: Create tables if they don't exist
         run: sqlite3 market.db < schema.sql
       
       - name: Ingest FRED data
