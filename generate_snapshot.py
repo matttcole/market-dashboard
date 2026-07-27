@@ -1,6 +1,8 @@
 """
 generate_snapshot.py — Export database to snapshot.json for the frontend.
 
+Includes current + previous day's values for trend calculations.
+
 Usage:
     python3 generate_snapshot.py
 
@@ -22,6 +24,7 @@ def main():
     # Build snapshot: series_key -> {obs_date: value, ...}
     snapshot = {}
     
+    # Get all observations, sorted by date descending
     cursor.execute("""
         SELECT series_key, obs_date, value
         FROM observations
@@ -29,10 +32,18 @@ def main():
         ORDER BY series_key, obs_date DESC
     """)
     
-    for series_key, obs_date, value in cursor.fetchall():
+    rows = cursor.fetchall()
+    series_count = {}
+    
+    for series_key, obs_date, value in rows:
         if series_key not in snapshot:
             snapshot[series_key] = {}
-        snapshot[series_key][obs_date] = value
+            series_count[series_key] = 0
+        
+        # Include latest + previous day (2 most recent observations)
+        if series_count[series_key] < 2:
+            snapshot[series_key][obs_date] = value
+            series_count[series_key] += 1
     
     # Add latest BoC consensus
     cursor.execute("""
