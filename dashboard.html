@@ -222,10 +222,10 @@
             "us.rate.10y": "US 10Y",
             "us.spread.2s10s": "US 2s10s Spread",
             "us.spread.3m10y": "US 3m10y Spread",
-            "us.inflation.pce": "US PCE",
-            "us.inflation.pce.core": "US Core PCE",
-            "us.inflation.cpi": "US CPI",
-            "us.inflation.cpi.core": "US Core CPI",
+            "us.inflation.pce": "US PCE (YoY)",
+            "us.inflation.pce.core": "US Core PCE (YoY)",
+            "us.inflation.cpi": "US CPI (YoY)",
+            "us.inflation.cpi.core": "US Core CPI (YoY)",
             "us.inflation.5y5y_fwd": "US 5y5y Forward",
             "us.labour.unemployment": "US Unemployment",
             "us.labour.payrolls": "US Payrolls",
@@ -237,7 +237,7 @@
             "ca.rate.5y": "Canada 5Y",
             "ca.rate.10y": "Canada 10Y",
             "ca.rate.policy": "BoC Policy Rate",
-            "ca.inflation.cpi": "Canada CPI",
+            "ca.inflation.cpi": "Canada CPI (YoY)",
             "btc.price.usd": "BTC",
             "btc.price.cad": "BTC (CAD)",
             "eth.price.usd": "ETH",
@@ -254,6 +254,14 @@
             "us.rate.sofr",
             "us.rate.30y",
             "ca.rate.corra",
+        ];
+        
+        const INFLATION_SERIES = [
+            "ca.inflation.cpi",
+            "us.inflation.cpi",
+            "us.inflation.cpi.core",
+            "us.inflation.pce",
+            "us.inflation.pce.core",
         ];
         
         const CURVES = {
@@ -386,17 +394,30 @@
                     const category = categorizeSeriesKey(series_key);
                     if (!grouped[category]) grouped[category] = [];
                     
-                    const dates = Object.keys(observations).sort().reverse();
-                    if (dates.length > 0) {
-                        const latest_date = dates[0];
-                        const latest_value = observations[latest_date];
+                    // Check if this is an inflation series with YoY calculated
+                    if (INFLATION_SERIES.includes(series_key) && data.yoy_rates && data.yoy_rates[series_key]) {
+                        const yoy = data.yoy_rates[series_key];
                         grouped[category].push({
                             series_key,
                             label: SERIES_LABELS[series_key] || series_key,
                             flag: getFlag(series_key),
-                            value: latest_value,
-                            obs_date: latest_date,
+                            value: yoy.rate,
+                            obs_date: yoy.current_date,
+                            is_yoy: true,
                         });
+                    } else {
+                        const dates = Object.keys(observations).sort().reverse();
+                        if (dates.length > 0) {
+                            const latest_date = dates[0];
+                            const latest_value = observations[latest_date];
+                            grouped[category].push({
+                                series_key,
+                                label: SERIES_LABELS[series_key] || series_key,
+                                flag: getFlag(series_key),
+                                value: latest_value,
+                                obs_date: latest_date,
+                            });
+                        }
                     }
                 }
                 

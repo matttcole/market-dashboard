@@ -1,51 +1,128 @@
 """
 generate_snapshot.py — Export database to snapshot.json for the frontend.
 
-Includes current + previous day's values for trend calculations.
-
-Usage:
-    python3 generate_snapshot.py
-
-Output:
-    snapshot.json (static file the frontend loads)
+Calculates YoY inflation rates from monthly CPI/PCE data.
 """
 
 import sqlite3
 import json
 import datetime as dt
+import re
 
 DB = "market.db"
 SNAPSHOT = "snapshot.json"
+
+INFLATION_SERIES = [
+    "ca.inflation.cpi",
+    "us.inflation.cpi",
+    "us.inflation.cpi.core",
+    "us.inflation.pce",
+    "us.inflation.pce.core",
+]
+
+def is_valid_date(date_str):
+    """Check if date string is valid YYYY-MM-DD format."""
+    try:
+        dt.datetime.strptime(date_str, "%Y-%m-%d")
+        return True
+    except ValueError:
+        return False
+
+def calculate_yoy_rate(values_by_date):
+    """Calculate YoY inflation rate from monthly index values."""
+    # Filter out invalid dates
+    valid_values = {date: val for date, val in values_by_date.items() if is_valid_date(date)}
+    
+    if len(valid_values) < 2:
+        return None
+    
+    sorted_dates = sorted(valid_values.keys(), reverse=True)
+    current_date = sorted_dates[0]
+    current_value = valid_values[current_date]
+    
+    try:
+        current_dt = dt.datetime.strptime(current_date, "%Y-%m-%d")
+    except ValueError:
+        return None
+    
+    target_dt = current_dt.replace(year=current_dt.year - 1)
+    
+    prior_date = None
+    prior_value = None
+    
+    for check_date_str in sorted_dates[1:]:
+        try:
+            check_dt = dt.datetime.strptime(check_date_str, "%Y-%m-%d")
+            if check_dt.year == target_dt.year and check_dt.month == target_dt.month:
+                prior_date = check_date_str
+                prior_value = valid_values[check_date_str]
+                break
+        except ValueError:
+            continue
+    
+    if prior_value is None:
+        return None
+    
+    yoy_rate = ((current_value - prior_value) / prior_value) * 100
+    return yoy_rate, current_date, prior_date
 
 def main():
     conn = sqlite3.connect(DB)
     cursor = conn.cursor()
     
-    # Build snapshot: series_key -> {obs_date: value, ...}
     snapshot = {}
     
-    # Get all observations, sorted by date descending
-    cursor.execute("""
-        SELECT series_key, obs_date, value
-        FROM observations
-        WHERE value IS NOT NULL
-        ORDER BY series_key, obs_date DESC
-    """)
-    
-    rows = cursor.fetchall()
-    series_count = {}
-    
-    for series_key, obs_date, value in rows:
-        if series_key not in snapshot:
-            snapshot[series_key] = {}
-            series_count[series_key] = 0
+    for inflation_series in INFLATION_SERIES:
+        cursor.execute("""
+            SELECT obs_date, value
+            FROM observations
+            WHERE series_key = ?
+            AND value IS NOT NULL
+            ORDER BY obs_date DESC
+            LIMIT 150
+        """, (inflation_series,))
         
-        # Include latest + previous day (2 most recent observations)
-        if series_count[series_key] < 2:
-            snapshot[series_key][obs_date] = value
-            series_count[series_key] += 1
+        rows = cursor.fetchall()
+        if rows:
+            values_by_date = {date: value for date, value in rows}
+            snapshot[inflation_series] = values_by_date
     
-    # Add latest BoC consensus
+    cursor.execute("""
+        SELECT DISTINCT series_key
+        FROM observations
+        WHERE series_key NOT IN ({})
+        ORDER BY series_key
+    """.format(','.join('?' * len(INFLATION_SERIES))), INFLATION_SERIES)
+    
+    other_series = [row[0] for row in cursor.fetchall()]
+    
+    for series_key in other_series:
+        cursor.execute("""
+            SELECT obs_date, value
+            FROM observations
+            WHERE series_key = ?
+            AND value IS NOT NULL
+            ORDER BY obs_date DESC
+            LIMIT 2
+        """, (series_key,))
+        
+        rows = cursor.fetchall()
+        if rows:
+            values_by_date = {date: value for date, value in rows}
+            snapshot[series_key] = values_by_date
+    
+    yoy_rates = {}
+    for inflation_series in INFLATION_SERIES:
+        if inflation_series in snapshot:
+            yoy_data = calculate_yoy_rate(snapshot[inflation_series])
+            if yoy_data:
+                yoy_rate, current_date, prior_date = yoy_data
+                yoy_rates[inflation_series] = {
+                    "rate": yoy_rate,
+                    "current_date": current_date,
+                    "prior_date": prior_date,
+                }
+    
     cursor.execute("""
         SELECT outcome, probability
         FROM rate_probabilities
@@ -63,7 +140,6 @@ def main():
             "probability": prob
         }
     
-    # Add latest Fed consensus
     cursor.execute("""
         SELECT outcome, probability
         FROM rate_probabilities
@@ -81,7 +157,6 @@ def main():
             "probability": prob
         }
     
-    # Add metadata
     metadata = {
         "generated_at": dt.datetime.now().isoformat(),
         "series_count": len(snapshot),
@@ -91,6 +166,7 @@ def main():
     output = {
         "_meta": metadata,
         "data": snapshot,
+        "yoy_rates": yoy_rates,
         "boc_consensus": boc_consensus,
         "fed_consensus": fed_consensus,
     }
@@ -103,6 +179,7 @@ def main():
     print(f"✓ Generated {SNAPSHOT}")
     print(f"  {metadata['series_count']} series")
     print(f"  {metadata['observations_count']} observations total")
+    print(f"  {len(yoy_rates)} YoY inflation rates calculated")
     if boc_consensus:
         print(f"  BoC Consensus: {boc_consensus['outcome'].upper()} ({boc_consensus['probability']:.1%})")
     if fed_consensus:
