@@ -1,0 +1,47 @@
+name: Daily Market Data Ingest
+
+on:
+  schedule:
+    # Run every day at 6 AM UTC (2 AM ET / 1 AM PT)
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual runs
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: pip install requests
+      
+      - name: Remove old database
+        run: rm -f market.db
+      
+      - name: Ingest FRED data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 ingest_fred.py
+      
+      - name: Ingest BoC and StatCan data
+        run: python3 ingest_boc_statcan.py
+      
+      - name: Ingest crypto data
+        run: python3 ingest_crypto.py
+      
+      - name: Generate snapshot
+        run: python3 generate_snapshot.py
+      
+      - name: Commit and push snapshot
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add snapshot.json
+          git commit -m "Daily snapshot: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
+          git push
