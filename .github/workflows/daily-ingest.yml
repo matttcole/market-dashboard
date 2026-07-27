@@ -26,6 +26,14 @@ jobs:
       - name: Create tables if they don't exist
         run: sqlite3 market.db < schema.sql
       
+      - name: Backfill inflation history (first run only)
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ ! -f market.db ] || [ ! -s market.db ]; then
+            python3 backfill_inflation_history.py
+          fi
+      
       - name: Ingest FRED data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
