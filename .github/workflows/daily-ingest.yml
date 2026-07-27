@@ -42,12 +42,13 @@ jobs:
   run: |
     git config --global user.email "actions@github.com"
     git config --global user.name "GitHub Actions"
+    - name: Ingest inflation & calculate YoY
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python3 ingest_inflation_with_history.py --fred-key ${{ secrets.FRED_API_KEY }} > inflation_output.json
 
-- name: Ingest inflation & calculate YoY
-  run: |
-    python ingest_inflation_with_history.py \
-      --fred-key ${{ secrets.FRED_API_KEY }} \
-    > inflation_output.json
+
       
       - name: Ingest BoC and StatCan data
         run: python3 ingest_boc_statcan.py
