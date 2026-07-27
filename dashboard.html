@@ -10,238 +10,163 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-            background: #0a0a0a;
-            color: #e8e8e8;
-            padding: 24px;
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            padding: 20px;
         }
-
+        
         .header {
-            max-width: 1600px;
-            margin: 0 auto 40px;
-            border-bottom: 1px solid #2a2a2a;
-            padding-bottom: 24px;
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
         }
-
+        
         .header-text h1 {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            font-size: 28px;
+            margin-bottom: 5px;
         }
-
+        
         .header-text .meta {
-            font-size: 13px;
-            color: #808080;
-            font-weight: 500;
+            font-size: 12px;
+            color: #888;
         }
-
+        
         .header-buttons {
             flex-shrink: 0;
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
-
+        
         .policy-btn {
             border: none;
-            padding: 11px 18px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.2s ease;
-            letter-spacing: 0.3px;
+            transition: all 0.2s;
         }
-
+        
         .cme-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-
+        
         .cme-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.35);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
         }
-
+        
         .boc-btn {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
         }
-
+        
         .boc-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(231, 76, 60, 0.35);
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.4);
         }
-
+        
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
         }
-
+        
         .section {
-            margin-bottom: 48px;
+            margin-bottom: 40px;
         }
-
+        
         .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #b0b0b0;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .section-content {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        .country-column {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .country-label {
-            font-size: 12px;
+            font-size: 16px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #888;
-            margin-bottom: 4px;
-            padding-left: 2px;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
         }
-
-        .divider {
-            width: 1px;
-            background: linear-gradient(180deg, transparent 0%, #3a3a3a 50%, transparent 100%);
-        }
-
+        
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
         }
-
+        
         .tile {
-            background: #151515;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 18px;
-            position: relative;
-            transition: all 0.2s ease;
-            overflow: hidden;
-        }
-
-        .tile::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            border-radius: 12px;
-        }
-
-        .tile.ca::before {
-            background: radial-gradient(ellipse at top-right, rgba(220, 50, 50, 0.08) 0%, transparent 70%);
-        }
-
-        .tile.us::before {
-            background: radial-gradient(ellipse at top-right, rgba(50, 120, 220, 0.08) 0%, transparent 70%);
-        }
-
-        .tile:hover {
-            border-color: #4a4a4a;
             background: #1a1a1a;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            transform: translateY(-1px);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            transition: all 0.2s;
         }
-
-        .tile-content {
-            position: relative;
-            z-index: 1;
+        
+        .tile:hover {
+            border-color: #555;
+            background: #222;
         }
-
+        
+        .tile-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        
         .tile-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 12px;
         }
-
-        .tile-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #909090;
+        
+        .tile-value {
+            font-size: 24px;
             font-weight: 600;
+            font-family: "Monaco", "Courier New", monospace;
+        }
+        
+        .tile-flag {
+            font-size: 20px;
+        }
+        
+        .curve-values {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .curve-value {
             flex: 1;
         }
-
-        .tile-flag {
+        
+        .curve-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .curve-rate {
             font-size: 18px;
-            margin-left: 8px;
-        }
-
-        .tile-value {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tile-trend {
-            font-size: 16px;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            min-width: 28px;
+            color: #64b5f6;
         }
-
-        .tile-trend.up {
-            color: #4ade80;
-        }
-
-        .tile-trend.down {
-            color: #f87171;
-        }
-
-        .tile-trend.neutral {
-            color: #a0a0a0;
-        }
-
+        
         .tile-date {
-            font-size: 12px;
-            color: #707070;
-            font-weight: 500;
+            font-size: 11px;
+            color: #666;
         }
-
-        .tile-confidence {
-            font-size: 12px;
-            color: #808080;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        /* Category-specific accent colors */
+        
         .rates .tile-value { color: #64b5f6; }
         .inflation .tile-value { color: #ff6b6b; }
         .labour .tile-value { color: #51cf66; }
@@ -250,79 +175,20 @@
         .fx .tile-value { color: #9575cd; }
         .sentiment .tile-value { color: #ef5350; }
         .policy .tile-value { color: #a78bfa; }
-
+        
         .loading {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px;
             color: #666;
-            font-size: 15px;
         }
-
+        
         .error {
-            background: #2a1515;
+            background: #2a1a1a;
             border: 1px solid #8b4545;
             color: #ff8a8a;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 6px;
             margin: 20px 0;
-            font-size: 14px;
-        }
-
-        /* Responsive design */
-        @media (max-width: 1200px) {
-            .section-content {
-                grid-template-columns: 1fr;
-            }
-
-            .divider {
-                display: none;
-            }
-
-            .country-label {
-                margin-top: 20px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 16px;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 16px;
-                margin-bottom: 32px;
-            }
-
-            .header-text h1 {
-                font-size: 26px;
-            }
-
-            .header-buttons {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .policy-btn {
-                width: 100%;
-                text-align: center;
-            }
-
-            .section-title {
-                font-size: 12px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tile {
-                padding: 16px;
-            }
-
-            .tile-value {
-                font-size: 22px;
-            }
         }
     </style>
 </head>
@@ -343,21 +209,17 @@
             </a>
         </div>
     </div>
-
+    
     <div class="container" id="dashboard">
         <div class="loading">Loading data...</div>
     </div>
-
+    
     <script>
         const SERIES_LABELS = {
-            "us.rate.fed.upper": "Fed Rate (Upper)",
-            "us.rate.fed.lower": "Fed Rate (Lower)",
-            "us.rate.effr": "EFFR",
-            "us.rate.sofr": "SOFR",
+            "us.rate.effr": "Fed Rate",
             "us.rate.2y": "US 2Y",
             "us.rate.5y": "US 5Y",
             "us.rate.10y": "US 10Y",
-            "us.rate.30y": "US 30Y",
             "us.spread.2s10s": "US 2s10s Spread",
             "us.spread.3m10y": "US 3m10y Spread",
             "us.inflation.pce": "US PCE",
@@ -374,8 +236,7 @@
             "ca.rate.2y": "Canada 2Y",
             "ca.rate.5y": "Canada 5Y",
             "ca.rate.10y": "Canada 10Y",
-            "ca.rate.corra": "CORRA",
-            "ca.rate.policy": "BoC Policy",
+            "ca.rate.policy": "BoC Policy Rate",
             "ca.inflation.cpi": "Canada CPI",
             "btc.price.usd": "BTC",
             "btc.price.cad": "BTC (CAD)",
@@ -386,7 +247,32 @@
             "stablecoin.supply.usd": "Stablecoin Supply",
             "fear.greed.index": "Fear & Greed",
         };
-
+        
+        const HIDDEN_SERIES = [
+            "us.rate.fed.upper",
+            "us.rate.fed.lower",
+            "us.rate.sofr",
+            "us.rate.30y",
+            "ca.rate.corra",
+        ];
+        
+        const CURVES = {
+            "us_curve": {
+                label: "US Curve",
+                flag: "🇺🇸",
+                category: "rates",
+                series: ["us.rate.2y", "us.rate.5y", "us.rate.10y"],
+                labels: ["2Y", "5Y", "10Y"],
+            },
+            "ca_curve": {
+                label: "Canada Curve",
+                flag: "🇨🇦",
+                category: "rates",
+                series: ["ca.rate.2y", "ca.rate.5y", "ca.rate.10y"],
+                labels: ["2Y", "5Y", "10Y"],
+            },
+        };
+        
         function categorizeSeriesKey(key) {
             if (key === "ca.rate.policy") return "rates";
             if (key.includes("us.rate") || key.includes("ca.rate")) return "rates";
@@ -397,14 +283,13 @@
             if (key.includes("btc") || key.includes("eth") || key.includes("crypto") || key.includes("stablecoin") || key.includes("fear.greed")) return "crypto";
             return "other";
         }
-
-        function getCountry(key) {
-            if (key.startsWith("us.") || key.startsWith("btc.") || key.startsWith("eth.") || key.startsWith("crypto.") || key.startsWith("stablecoin.") || key.startsWith("fear.")) {
-                return "us";
-            }
-            return "ca";
+        
+        function getFlag(series_key) {
+            if (series_key.startsWith("us.") || series_key === "us_curve") return "🇺🇸";
+            if (series_key.startsWith("ca.") || series_key === "ca_curve") return "🇨🇦";
+            return "";
         }
-
+        
         function formatValue(series_key, value) {
             if (series_key.includes("price")) {
                 return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
@@ -429,38 +314,18 @@
             }
             return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
         }
-
-        function calculateTrend(observations) {
-            const dates = Object.keys(observations).sort().reverse();
-            if (dates.length < 2) {
-                return { trend: "neutral", symbol: "—", change: null };
-            }
-
-            const latest = observations[dates[0]];
-            const previous = observations[dates[1]];
-
-            if (latest > previous) {
-                return { trend: "up", symbol: "↑", change: latest - previous };
-            } else if (latest < previous) {
-                return { trend: "down", symbol: "↓", change: latest - previous };
-            } else {
-                return { trend: "neutral", symbol: "—", change: 0 };
-            }
-        }
-
+        
         async function loadDashboard() {
             try {
                 const response = await fetch("snapshot.json");
                 const data = await response.json();
-
-                document.getElementById("lastUpdated").textContent =
+                
+                document.getElementById("lastUpdated").textContent = 
                     `Last updated: ${new Date(data._meta.generated_at).toLocaleString()}`;
-
+                
                 const grouped = {};
-
-                // Add Fed and BoC consensus to policy section
                 const policyTiles = [];
-
+                
                 if (data.fed_consensus && data.fed_consensus.outcome) {
                     policyTiles.push({
                         series_key: "fed.consensus",
@@ -468,10 +333,8 @@
                         value: data.fed_consensus.outcome.toUpperCase(),
                         value_pct: (data.fed_consensus.probability * 100).toFixed(1),
                         obs_date: "Market Consensus",
-                        country: "us",
                     });
                 }
-
                 if (data.boc_consensus && data.boc_consensus.outcome) {
                     policyTiles.push({
                         series_key: "boc.consensus",
@@ -479,114 +342,134 @@
                         value: data.boc_consensus.outcome.toUpperCase(),
                         value_pct: (data.boc_consensus.probability * 100).toFixed(1),
                         obs_date: "Market Consensus",
-                        country: "ca",
                     });
                 }
-
-                if (policyTiles.length > 0) {
-                    grouped.policy = policyTiles;
+                if (policyTiles.length > 0) grouped.policy = policyTiles;
+                
+                for (const [curve_key, curve_def] of Object.entries(CURVES)) {
+                    const values = {};
+                    let obs_dates = [];
+                    
+                    for (const series_key of curve_def.series) {
+                        if (data.data[series_key]) {
+                            const dates = Object.keys(data.data[series_key]).sort().reverse();
+                            if (dates.length > 0) {
+                                obs_dates.push(dates[0]);
+                                const latest_date = dates[0];
+                                values[series_key] = data.data[series_key][latest_date];
+                            }
+                        }
+                    }
+                    
+                    if (Object.keys(values).length === curve_def.series.length) {
+                        if (!grouped[curve_def.category]) grouped[curve_def.category] = [];
+                        grouped[curve_def.category].push({
+                            series_key: curve_key,
+                            label: curve_def.label,
+                            flag: curve_def.flag,
+                            curve_values: values,
+                            curve_labels: curve_def.labels,
+                            curve_series: curve_def.series,
+                            obs_date: obs_dates[0],
+                            is_curve: true,
+                        });
+                    }
                 }
-
-                // Add observations
+                
+                const curve_series_flat = Object.values(CURVES).flatMap(c => c.series);
+                
                 for (const [series_key, observations] of Object.entries(data.data)) {
+                    if (HIDDEN_SERIES.includes(series_key) || curve_series_flat.includes(series_key)) {
+                        continue;
+                    }
+                    
                     const category = categorizeSeriesKey(series_key);
                     if (!grouped[category]) grouped[category] = [];
-
+                    
                     const dates = Object.keys(observations).sort().reverse();
                     if (dates.length > 0) {
                         const latest_date = dates[0];
                         const latest_value = observations[latest_date];
-                        const trend = calculateTrend(observations);
-
                         grouped[category].push({
                             series_key,
                             label: SERIES_LABELS[series_key] || series_key,
+                            flag: getFlag(series_key),
                             value: latest_value,
                             obs_date: latest_date,
-                            country: getCountry(series_key),
-                            trend: trend,
                         });
                     }
                 }
-
-                // Render
+                
                 let html = "";
                 const categoryOrder = ["policy", "rates", "inflation", "labour", "growth", "fx", "crypto"];
-
+                
                 for (const category of categoryOrder) {
                     if (!grouped[category] || grouped[category].length === 0) continue;
-
-                    const tiles = grouped[category].sort((a, b) => a.label.localeCompare(b.label));
-
-                    // Separate by country
-                    const caTiles = tiles.filter(t => t.country === "ca");
-                    const usTiles = tiles.filter(t => t.country === "us");
-
-                    const renderTile = (d) => {
-                        const flag = d.country === "ca" ? "🇨🇦" : "🇺🇸";
-                        const countryClass = d.country;
-
-                        if (d.value_pct) {
-                            return `
-                                <div class="tile ${countryClass}">
-                                    <div class="tile-content">
+                    
+                    const tiles = grouped[category]
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .map(d => {
+                            if (d.value_pct) {
+                                return `
+                                    <div class="tile">
+                                        <div class="tile-label">${d.label}</div>
+                                        <div class="tile-value">${d.value}</div>
+                                        <div class="tile-date">${d.value_pct}% confidence</div>
+                                    </div>
+                                `;
+                            }
+                            if (d.is_curve) {
+                                const curve_html = d.curve_labels.map((label, i) => {
+                                    const series_key = d.curve_series[i];
+                                    const val = d.curve_values[series_key];
+                                    return `
+                                        <div class="curve-value">
+                                            <div class="curve-label">${label}</div>
+                                            <div class="curve-rate">${val.toFixed(2)}%</div>
+                                        </div>
+                                    `;
+                                }).join("");
+                                
+                                return `
+                                    <div class="tile">
                                         <div class="tile-header">
                                             <div class="tile-label">${d.label}</div>
-                                            <div class="tile-flag">${flag}</div>
+                                            <div class="tile-flag">${d.flag}</div>
                                         </div>
-                                        <div class="tile-value">${d.value}</div>
-                                        <div class="tile-confidence">${d.value_pct}% confidence</div>
+                                        <div class="curve-values">${curve_html}</div>
+                                        <div class="tile-date">as of ${d.obs_date}</div>
                                     </div>
-                                </div>
-                            `;
-                        }
-
-                        return `
-                            <div class="tile ${countryClass}">
-                                <div class="tile-content">
+                                `;
+                            }
+                            return `
+                                <div class="tile">
                                     <div class="tile-header">
                                         <div class="tile-label">${d.label}</div>
-                                        <div class="tile-flag">${flag}</div>
+                                        <div class="tile-flag">${d.flag}</div>
                                     </div>
-                                    <div class="tile-value">
-                                        ${formatValue(d.series_key, d.value)}
-                                        <span class="tile-trend ${d.trend.trend}">${d.trend.symbol}</span>
-                                    </div>
+                                    <div class="tile-value">${formatValue(d.series_key, d.value)}</div>
                                     <div class="tile-date">as of ${d.obs_date}</div>
                                 </div>
-                            </div>
-                        `;
-                    };
-
-                    const caGrid = caTiles.map(renderTile).join("");
-                    const usGrid = usTiles.map(renderTile).join("");
-
+                            `;
+                        })
+                        .join("");
+                    
                     html += `
                         <div class="section ${category}">
                             <div class="section-title">${category}</div>
-                            <div class="section-content">
-                                <div>
-                                    <div class="country-label">🇨🇦 Canada</div>
-                                    <div class="grid">${caGrid || '<div style="color: #666; padding: 20px; text-align: center;">No data</div>'}</div>
-                                </div>
-                                <div class="divider"></div>
-                                <div>
-                                    <div class="country-label">🇺🇸 United States</div>
-                                    <div class="grid">${usGrid || '<div style="color: #666; padding: 20px; text-align: center;">No data</div>'}</div>
-                                </div>
-                            </div>
+                            <div class="grid">${tiles}</div>
                         </div>
                     `;
                 }
-
+                
                 document.getElementById("dashboard").innerHTML = html;
-
+                
             } catch (error) {
-                document.getElementById("dashboard").innerHTML =
+                document.getElementById("dashboard").innerHTML = 
                     `<div class="error">Error loading dashboard: ${error.message}</div>`;
             }
         }
-
+        
         loadDashboard();
     </script>
 </body>
