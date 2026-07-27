@@ -1,0 +1,10 @@
+{
+  "description": "Raw FRED inflation observations. Append new points; never delete. Used to calculate YoY rates.",
+  "schema": {
+    "series_key": "unique identifier (e.g., 'us.cpi.core')",
+    "obs_date": "YYYY-MM-DD, the period the observation describes",
+    "value": "raw series value (e.g., 336.06 for CPI index)",
+    "fetched_at": "ISO 8601 timestamp when this was pulled from FRED"
+  },
+  "observations": []
+}
