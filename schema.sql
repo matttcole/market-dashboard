@@ -44,3 +44,17 @@ CREATE TABLE IF NOT EXISTS raw_responses (
 );
 
 CREATE INDEX IF NOT EXISTS ix_raw_recent ON raw_responses(fetched_at DESC);
+
+-- FedWatch and BoC rate probabilities
+CREATE TABLE IF NOT EXISTS rate_probabilities (
+    asof_date TEXT NOT NULL,
+    central_bank TEXT NOT NULL,
+    meeting_date TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    probability REAL NOT NULL,
+    implied_rate REAL,
+    anchor TEXT,
+    PRIMARY KEY (asof_date, central_bank, meeting_date, outcome)
+);
+
+CREATE INDEX IF NOT EXISTS ix_prob_recent ON rate_probabilities(asof_date DESC, central_bank);
