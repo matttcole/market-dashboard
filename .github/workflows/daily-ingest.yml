@@ -38,13 +38,11 @@ jobs:
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python3 ingest_fred.py
-
-        - name: Ingest inflation history
+      
+      - name: Ingest inflation history
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python3 ingest_inflation_with_history.py --fred-key ${{ secrets.FRED_API_KEY }} > inflation_output.json
-
-
       
       - name: Ingest BoC and StatCan data
         run: python3 ingest_boc_statcan.py
