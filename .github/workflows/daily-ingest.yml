@@ -22,10 +22,13 @@ jobs:
           python-version: '3.9'
       
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests beautifulsoup4
       
       - name: Remove old database
         run: rm -f market.db
+      
+      - name: Create rate_probabilities table
+        run: sqlite3 market.db < schema.sql
       
       - name: Ingest FRED data
         env:
@@ -37,6 +40,9 @@ jobs:
       
       - name: Ingest crypto data
         run: python3 ingest_crypto.py
+      
+      - name: Ingest BoC rate expectations
+        run: python3 ingest_boc_expectations.py
       
       - name: Generate snapshot
         run: python3 generate_snapshot.py
