@@ -185,7 +185,6 @@
     
     <script>
         const SERIES_LABELS = {
-            // US Rates
             "us.rate.fed.upper": "Fed Rate (Upper)",
             "us.rate.fed.lower": "Fed Rate (Lower)",
             "us.rate.effr": "EFFR",
@@ -196,24 +195,16 @@
             "us.rate.30y": "US 30Y",
             "us.spread.2s10s": "US 2s10s Spread",
             "us.spread.3m10y": "US 3m10y Spread",
-            
-            // US Inflation
             "us.inflation.pce": "US PCE",
             "us.inflation.pce.core": "US Core PCE",
             "us.inflation.cpi": "US CPI",
             "us.inflation.cpi.core": "US Core CPI",
             "us.inflation.5y5y_fwd": "US 5y5y Forward",
-            
-            // US Labour
             "us.labour.unemployment": "US Unemployment",
             "us.labour.payrolls": "US Payrolls",
             "us.labour.initial_claims": "Initial Claims",
-            
-            // US Growth
             "us.growth.gdp_real": "US Real GDP",
             "us.growth.gdp_nowcast": "US GDP Nowcast",
-            
-            // Canada
             "ca.fx.usdcad": "USD/CAD",
             "ca.rate.2y": "Canada 2Y",
             "ca.rate.5y": "Canada 5Y",
@@ -221,8 +212,6 @@
             "ca.rate.corra": "CORRA",
             "ca.rate.policy": "BoC Policy",
             "ca.inflation.cpi": "Canada CPI",
-            
-            // Crypto
             "btc.price.usd": "BTC",
             "btc.price.cad": "BTC (CAD)",
             "eth.price.usd": "ETH",
@@ -233,15 +222,18 @@
             "fear.greed.index": "Fear & Greed",
         };
         
-        const CATEGORIES = {
-            policy: ["policy"],
-            rates: ["us.rate", "ca.rate"],
-            inflation: ["us.inflation", "ca.inflation"],
-            labour: ["us.labour"],
-            growth: ["us.growth"],
-            fx: ["ca.fx"],
-            crypto: ["btc", "eth", "crypto", "stablecoin", "fear.greed"],
-        };
+        function categorizeSeriesKey(key) {
+            // Don't categorize ca.rate.policy as "policy" - it goes in rates
+            if (key === "ca.rate.policy") return "rates";
+            
+            if (key.includes("us.rate") || key.includes("ca.rate")) return "rates";
+            if (key.includes("us.inflation") || key.includes("ca.inflation")) return "inflation";
+            if (key.includes("us.labour")) return "labour";
+            if (key.includes("us.growth")) return "growth";
+            if (key.includes("ca.fx")) return "fx";
+            if (key.includes("btc") || key.includes("eth") || key.includes("crypto") || key.includes("stablecoin") || key.includes("fear.greed")) return "crypto";
+            return "other";
+        }
         
         function formatValue(series_key, value) {
             if (series_key.includes("price")) {
@@ -273,14 +265,12 @@
                 const response = await fetch("snapshot.json");
                 const data = await response.json();
                 
-                // Update timestamp
                 document.getElementById("lastUpdated").textContent = 
                     `Last updated: ${new Date(data._meta.generated_at).toLocaleString()}`;
                 
-                // Group by category
                 const grouped = {};
                 
-                // Add BoC consensus to policy section
+                // Add BoC consensus to policy section ONLY if it exists
                 if (data.boc_consensus && data.boc_consensus.outcome) {
                     grouped.policy = [{
                         series_key: "boc.consensus",
@@ -291,26 +281,21 @@
                     }];
                 }
                 
+                // Add observations
                 for (const [series_key, observations] of Object.entries(data.data)) {
-                    for (const [cat, patterns] of Object.entries(CATEGORIES)) {
-                        for (const pattern of patterns) {
-                            if (series_key.includes(pattern)) {
-                                if (!grouped[cat]) grouped[cat] = [];
-                                
-                                const dates = Object.keys(observations).sort().reverse();
-                                if (dates.length > 0) {
-                                    const latest_date = dates[0];
-                                    const latest_value = observations[latest_date];
-                                    grouped[cat].push({
-                                        series_key,
-                                        label: SERIES_LABELS[series_key] || series_key,
-                                        value: latest_value,
-                                        obs_date: latest_date,
-                                    });
-                                }
-                                break;
-                            }
-                        }
+                    const category = categorizeSeriesKey(series_key);
+                    if (!grouped[category]) grouped[category] = [];
+                    
+                    const dates = Object.keys(observations).sort().reverse();
+                    if (dates.length > 0) {
+                        const latest_date = dates[0];
+                        const latest_value = observations[latest_date];
+                        grouped[category].push({
+                            series_key,
+                            label: SERIES_LABELS[series_key] || series_key,
+                            value: latest_value,
+                            obs_date: latest_date,
+                        });
                     }
                 }
                 
