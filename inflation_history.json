@@ -5870,6 +5870,12 @@
       "fetched_at": "2026-07-27T20:52:51.898062Z"
     },
     {
+      "series_key": "us.inflation.cpi",
+      "obs_date": "2026-07-01",
+      "value": 332.813,
+      "fetched_at": "2026-08-13T07:38:38.624989Z"
+    },
+    {
       "series_key": "us.inflation.cpi.core",
       "obs_date": "1957-01-01",
       "value": 28.5,
@@ -10866,6 +10872,12 @@
       "obs_date": "2026-06-01",
       "value": 336.065,
       "fetched_at": "2026-07-27T20:52:51.444086Z"
+    },
+    {
+      "series_key": "us.inflation.cpi.core",
+      "obs_date": "2026-07-01",
+      "value": 336.789,
+      "fetched_at": "2026-08-13T07:38:38.371963Z"
     },
     {
       "series_key": "us.inflation.pce",
