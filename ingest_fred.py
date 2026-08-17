@@ -46,7 +46,7 @@ P1_SERIES = {
     "ICSA": ("us.labour.initial_claims", "thousands", "w", "labour"),
     
     # Growth
-    "GDPC1": ("us.growth.gdp_real", "billions", "q", "growth"),
+    "A191RL1Q225SBEA": ("us.growth.gdp_rate", "percent", "q", "growth"),
     "GDPNOW": ("us.growth.gdp_nowcast", "percent", "d", "growth"),
 }
 
