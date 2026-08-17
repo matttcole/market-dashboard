@@ -52,6 +52,9 @@ jobs:
       
       - name: Ingest BoC rate expectations
         run: python3 ingest_boc_expectations.py
+
+      - name: Ingest Fed rate expectations
+        run: python3 ingest_fed_polymarket.py
       
       - name: Generate snapshot
         run: python3 generate_snapshot.py

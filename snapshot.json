@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated_at": "2026-08-17T18:53:12.679632",
+    "generated_at": "2026-08-17T19:56:15.967877",
     "series_count": 36,
     "observations_count": 39
   },
@@ -143,5 +143,8 @@
     "outcome": "hold",
     "probability": 0.9975
   },
-  "fed_consensus": {}
+  "fed_consensus": {
+    "outcome": "hold",
+    "probability": 0.705
+  }
 }
