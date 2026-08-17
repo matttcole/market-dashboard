@@ -1,2 +1,5 @@
 market.db
 snapshot.json
+.DS_Store
+*.bak
+inflation_output.json

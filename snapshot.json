@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "generated_at": "2026-08-17T17:56:35.160009",
-    "series_count": 35,
-    "observations_count": 35
+    "generated_at": "2026-08-17T18:19:48.822538",
+    "series_count": 37,
+    "observations_count": 37
   },
   "data": {
     "ca.inflation.cpi": {
@@ -31,6 +31,12 @@
     },
     "ca.fx.usdcad": {
       "2026-08-17": 1.3865
+    },
+    "ca.growth.gdp_rate": {
+      "2026-01-01": 0.0
+    },
+    "ca.growth.gdp_rate_annualized": {
+      "2026-01-01": -0.144
     },
     "ca.rate.10y": {
       "2026-08-14": 3.68

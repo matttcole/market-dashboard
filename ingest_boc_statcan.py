@@ -22,6 +22,15 @@ BOC_SERIES = {
     "V39079": ("ca.rate.policy", "percent", "d", "rates"),
 }
 
+# StatCan WDS series — vector IDs verified via getCubeMetadata /
+# getSeriesInfoFromCubePidCoord, not guessed. See discover_ca_gdp.py /
+# resolve_ca_gdp_vectors.py for how these were resolved.
+STATCAN_SERIES = {
+    41690973: ("ca.inflation.cpi", "18-10-0004-01", "percent", "m", "inflation"),
+    1594571783: ("ca.growth.gdp_rate", "36-10-0104-01", "percent", "q", "growth"),
+    79448580: ("ca.growth.gdp_rate_annualized", "36-10-0104-01", "percent", "q", "growth"),
+}
+
 def fetch_boc(series_id):
     """Get latest observation from BoC Valet."""
     r = requests.get(
@@ -95,11 +104,8 @@ def init_series(conn):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (series_key, "boc", source_id, source_id, unit, freq, cat, "CA", 1))
     
-    # StatCan (manually curated vector IDs from verify_sources.py output)
-    statcan_series = {
-        "ca.inflation.cpi": (41690973, "18-10-0004-01", "percent", "m", "inflation"),
-    }
-    for series_key, (vector_id, table_id, unit, freq, cat) in statcan_series.items():
+    # StatCan
+    for vector_id, (series_key, table_id, unit, freq, cat) in STATCAN_SERIES.items():
         cursor.execute("""
             INSERT OR IGNORE INTO series
             (series_key, source, source_id, label, unit, frequency, category, country, priority)
@@ -126,16 +132,17 @@ def main():
         except Exception as e:
             print(f"  {series_key:<30} ERROR: {e}")
     
-    print(f"\nFetching StatCan CPI...")
-    try:
-        obs_date, value = fetch_statcan(41690973, "18-10-0004-01")
-        if obs_date and value is not None:
-            upsert_observation(conn, "ca.inflation.cpi", obs_date, value)
-            print(f"  ca.inflation.cpi{' ' * 16} {obs_date} = {value}")
-        else:
-            print(f"  ca.inflation.cpi{' ' * 16} (no data)")
-    except Exception as e:
-        print(f"  ca.inflation.cpi{' ' * 16} ERROR: {e}")
+    print(f"\nFetching {len(STATCAN_SERIES)} StatCan series...")
+    for vector_id, (series_key, table_id, *_) in STATCAN_SERIES.items():
+        try:
+            obs_date, value = fetch_statcan(vector_id, table_id)
+            if obs_date and value is not None:
+                upsert_observation(conn, series_key, obs_date, value)
+                print(f"  {series_key:<30} {obs_date} = {value}")
+            else:
+                print(f"  {series_key:<30} (no data)")
+        except Exception as e:
+            print(f"  {series_key:<30} ERROR: {e}")
     
     conn.close()
     print(f"\n✓ Data loaded into {DB}")
