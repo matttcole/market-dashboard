@@ -7,7 +7,7 @@ were unverified, and the two Canadian APIs fail *silently* — a wrong ID return
 an empty array with HTTP 200, not an error. This script surfaces that.
 
     pip install requests
-    export FRED_API_KEY= f3be1e2ebf4f9bbbb122cfd28ee049a5
+    export FRED_API_KEY=your_key_here
     export COINGECKO_KEY=xxxx      # optional; falls back to keyless
     python verify_sources.py
 
