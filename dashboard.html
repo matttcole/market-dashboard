@@ -288,7 +288,7 @@
             if (key.includes("us.rate") || key.includes("ca.rate")) return "rates";
             if (key.includes("us.inflation") || key.includes("ca.inflation")) return "inflation";
             if (key.includes("us.labour")) return "labour";
-            if (key.includes("us.growth")) return "growth";
+            if (key.includes("us.growth") || key.includes("ca.growth")) return "growth";
             if (key.includes("ca.fx")) return "fx";
             if (key.includes("btc") || key.includes("eth") || key.includes("crypto") || key.includes("stablecoin") || key.includes("fear.greed")) return "crypto";
             return "other";
