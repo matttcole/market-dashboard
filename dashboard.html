@@ -222,14 +222,11 @@
             "us.rate.10y": "US 10Y",
             "us.spread.2s10s": "US 2s10s Spread",
             "us.spread.3m10y": "US 3m10y Spread",
-            "us.inflation.pce": "US PCE (YoY)",
             "us.inflation.pce.core": "US Core PCE (YoY)",
             "us.inflation.cpi": "US CPI (YoY)",
             "us.inflation.cpi.core": "US Core CPI (YoY)",
             "us.inflation.5y5y_fwd": "US 5y5y Forward",
             "us.labour.unemployment": "US Unemployment",
-            "us.labour.payrolls": "US Payrolls",
-            "us.labour.initial_claims": "Initial Claims",
             "us.growth.gdp_rate": "US GDP Growth Rate",
             "us.growth.gdp_nowcast": "US GDP Nowcast",
             "ca.growth.gdp_rate": "Canada GDP Growth Rate",
@@ -240,6 +237,8 @@
             "ca.rate.10y": "Canada 10Y",
             "ca.rate.policy": "BoC Policy Rate",
             "ca.inflation.cpi": "Canada CPI (YoY)",
+            "ca.inflation.core": "Canada Core CPI (Trim/Median Avg)",
+            "ca.labour.unemployment": "Canada Unemployment",
             "btc.price.usd": "BTC",
             "btc.price.cad": "BTC (CAD)",
             "eth.price.usd": "ETH",
@@ -262,7 +261,6 @@
             "ca.inflation.cpi",
             "us.inflation.cpi",
             "us.inflation.cpi.core",
-            "us.inflation.pce",
             "us.inflation.pce.core",
         ];
         
@@ -287,7 +285,7 @@
             if (key === "ca.rate.policy") return "rates";
             if (key.includes("us.rate") || key.includes("ca.rate")) return "rates";
             if (key.includes("us.inflation") || key.includes("ca.inflation")) return "inflation";
-            if (key.includes("us.labour")) return "labour";
+            if (key.includes("us.labour") || key.includes("ca.labour")) return "labour";
             if (key.includes("us.growth") || key.includes("ca.growth")) return "growth";
             if (key.includes("ca.fx")) return "fx";
             if (key.includes("btc") || key.includes("eth") || key.includes("crypto") || key.includes("stablecoin") || key.includes("fear.greed")) return "crypto";

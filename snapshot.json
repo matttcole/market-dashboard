@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "generated_at": "2026-08-17T18:19:48.822538",
-    "series_count": 37,
-    "observations_count": 37
+    "generated_at": "2026-08-17T18:53:12.679632",
+    "series_count": 36,
+    "observations_count": 39
   },
   "data": {
     "ca.inflation.cpi": {
@@ -13,9 +13,6 @@
     },
     "us.inflation.cpi.core": {
       "2026-07-01": 336.789
-    },
-    "us.inflation.pce": {
-      "2026-06-01": 131.392
     },
     "us.inflation.pce.core": {
       "2026-06-01": 130.266
@@ -37,6 +34,12 @@
     },
     "ca.growth.gdp_rate_annualized": {
       "2026-01-01": -0.144
+    },
+    "ca.inflation.core": {
+      "2026-07-01": 1.95
+    },
+    "ca.labour.unemployment": {
+      "2026-07-01": 6.4
     },
     "ca.rate.10y": {
       "2026-08-14": 3.68
@@ -75,13 +78,8 @@
       "2026-04-01": 1.5
     },
     "us.inflation.5y5y_fwd": {
+      "2026-08-17": 2.31,
       "2026-08-14": 2.3
-    },
-    "us.labour.initial_claims": {
-      "2026-08-08": 209000.0
-    },
-    "us.labour.payrolls": {
-      "2026-07-01": 158858.0
     },
     "us.labour.unemployment": {
       "2026-07-01": 4.1
@@ -111,9 +109,11 @@
       "2026-08-14": 3.62
     },
     "us.spread.2s10s": {
+      "2026-08-17": 0.53,
       "2026-08-14": 0.51
     },
     "us.spread.3m10y": {
+      "2026-08-17": 0.85,
       "2026-08-14": 0.82
     }
   },
@@ -131,11 +131,6 @@
     "us.inflation.cpi.core": {
       "rate": 2.47,
       "current_date": "2026-07-01",
-      "prior_date": "2025-07-01"
-    },
-    "us.inflation.pce": {
-      "rate": 3.49,
-      "current_date": "2026-06-01",
       "prior_date": "2025-07-01"
     },
     "us.inflation.pce.core": {

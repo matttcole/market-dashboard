@@ -17,7 +17,6 @@ INFLATION_SERIES = [
     "ca.inflation.cpi",
     "us.inflation.cpi",
     "us.inflation.cpi.core",
-    "us.inflation.pce",
     "us.inflation.pce.core",
 ]
 
@@ -32,6 +31,8 @@ def calculate_yoy_from_history() -> dict:
     by_series = {}
     for obs in history.get("observations", []):
         series_key = obs["series_key"]
+        if series_key not in INFLATION_SERIES:
+            continue
         if series_key not in by_series:
             by_series[series_key] = []
         by_series[series_key].append(obs)

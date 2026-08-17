@@ -35,15 +35,12 @@ P1_SERIES = {
     
     # Inflation
     "PCEPILFE": ("us.inflation.pce.core", "index", "m", "inflation"),
-    "PCEPI": ("us.inflation.pce", "index", "m", "inflation"),
     "CPIAUCSL": ("us.inflation.cpi", "index", "m", "inflation"),
     "CPILFESL": ("us.inflation.cpi.core", "index", "m", "inflation"),
     "T5YIFR": ("us.inflation.5y5y_fwd", "percent", "d", "inflation"),
     
     # Labour
     "UNRATE": ("us.labour.unemployment", "percent", "m", "labour"),
-    "PAYEMS": ("us.labour.payrolls", "thousands", "m", "labour"),
-    "ICSA": ("us.labour.initial_claims", "thousands", "w", "labour"),
     
     # Growth
     "A191RL1Q225SBEA": ("us.growth.gdp_rate", "percent", "q", "growth"),

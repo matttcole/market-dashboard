@@ -23,12 +23,12 @@ BOC_SERIES = {
 }
 
 # StatCan WDS series — vector IDs verified via getCubeMetadata /
-# getSeriesInfoFromCubePidCoord, not guessed. See discover_ca_gdp.py /
-# resolve_ca_gdp_vectors.py for how these were resolved.
+# getSeriesInfoFromCubePidCoord, cross-checked against published figures.
 STATCAN_SERIES = {
     41690973: ("ca.inflation.cpi", "18-10-0004-01", "percent", "m", "inflation"),
     1594571783: ("ca.growth.gdp_rate", "36-10-0104-01", "percent", "q", "growth"),
     79448580: ("ca.growth.gdp_rate_annualized", "36-10-0104-01", "percent", "q", "growth"),
+    2062815: ("ca.labour.unemployment", "14-10-0287-01", "percent", "m", "labour"),
 }
 
 def fetch_boc(series_id):
@@ -112,6 +112,14 @@ def init_series(conn):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (series_key, "statcan", table_id, f"StatCan {table_id}", unit, freq, cat, "CA", 1))
     
+    # Derived: Canada core CPI (average of BoC's trim + median measures)
+    cursor.execute("""
+        INSERT OR IGNORE INTO series
+        (series_key, source, source_id, label, unit, frequency, category, country, priority)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, ("ca.inflation.core", "boc", "CPI_TRIM+CPI_MEDIAN avg", "Canada Core CPI (derived)",
+          "percent", "m", "inflation", "CA", 1))
+    
     conn.commit()
 
 def main():
@@ -143,6 +151,21 @@ def main():
                 print(f"  {series_key:<30} (no data)")
         except Exception as e:
             print(f"  {series_key:<30} ERROR: {e}")
+    
+    print(f"\nFetching Canada core CPI (avg of trim + median)...")
+    try:
+        trim_date, trim_val = fetch_boc("CPI_TRIM")
+        median_date, median_val = fetch_boc("CPI_MEDIAN")
+        if trim_val is not None and median_val is not None:
+            avg_val = round((trim_val + median_val) / 2, 3)
+            # use the later of the two dates (should normally match)
+            obs_date = max(trim_date, median_date)
+            upsert_observation(conn, "ca.inflation.core", obs_date, avg_val)
+            print(f"  ca.inflation.core{' ' * 13} {obs_date} = {avg_val}  (trim={trim_val}, median={median_val})")
+        else:
+            print(f"  ca.inflation.core{' ' * 13} (missing trim or median data)")
+    except Exception as e:
+        print(f"  ca.inflation.core{' ' * 13} ERROR: {e}")
     
     conn.close()
     print(f"\n✓ Data loaded into {DB}")
