@@ -113,7 +113,7 @@ def main():
     yoy_rates = calculate_yoy_from_history()
     
     cursor.execute("""
-        SELECT outcome, probability
+        SELECT outcome, probability, meeting_date
         FROM rate_probabilities
         WHERE central_bank = 'BOC'
         ORDER BY asof_date DESC, meeting_date ASC
@@ -123,14 +123,15 @@ def main():
     boc_result = cursor.fetchone()
     boc_consensus = {}
     if boc_result:
-        outcome, prob = boc_result
+        outcome, prob, meeting_date = boc_result
         boc_consensus = {
             "outcome": outcome,
-            "probability": prob
+            "probability": prob,
+            "meeting_date": meeting_date
         }
     
     cursor.execute("""
-        SELECT outcome, probability
+        SELECT outcome, probability, meeting_date
         FROM rate_probabilities
         WHERE central_bank = 'FED'
         ORDER BY asof_date DESC, meeting_date ASC
@@ -140,10 +141,11 @@ def main():
     fed_result = cursor.fetchone()
     fed_consensus = {}
     if fed_result:
-        outcome, prob = fed_result
+        outcome, prob, meeting_date = fed_result
         fed_consensus = {
             "outcome": outcome,
-            "probability": prob
+            "probability": prob,
+            "meeting_date": meeting_date
         }
     
     metadata = {

@@ -338,8 +338,10 @@
                     policyTiles.push({
                         series_key: "fed.consensus",
                         label: "Fed Next Decision",
+                        flag: "🇺🇸",
                         value: data.fed_consensus.outcome.toUpperCase(),
                         value_pct: (data.fed_consensus.probability * 100).toFixed(1),
+                        meeting_date: data.fed_consensus.meeting_date,
                         obs_date: "Market Consensus",
                     });
                 }
@@ -347,8 +349,10 @@
                     policyTiles.push({
                         series_key: "boc.consensus",
                         label: "BoC Next Decision",
+                        flag: "🇨🇦",
                         value: data.boc_consensus.outcome.toUpperCase(),
                         value_pct: (data.boc_consensus.probability * 100).toFixed(1),
+                        meeting_date: data.boc_consensus.meeting_date,
                         obs_date: "Market Consensus",
                     });
                 }
@@ -433,9 +437,12 @@
                             if (d.value_pct) {
                                 return `
                                     <div class="tile">
-                                        <div class="tile-label">${d.label}</div>
+                                        <div class="tile-header">
+                                            <div class="tile-label">${d.label}</div>
+                                            <div class="tile-flag">${d.flag || ""}</div>
+                                        </div>
                                         <div class="tile-value">${d.value}</div>
-                                        <div class="tile-date">${d.value_pct}% confidence</div>
+                                        <div class="tile-date">${d.value_pct}% confidence \u00b7 meeting ${d.meeting_date || "TBD"}</div>
                                     </div>
                                 `;
                             }
