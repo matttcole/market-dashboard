@@ -31,6 +31,11 @@ STATCAN_SERIES = {
     2062815: ("ca.labour.unemployment", "14-10-0287-01", "percent", "m", "labour"),
 }
 
+# How many recent periods to re-check per run. StatCan revises recent GDP,
+# CPI, and LFS figures periodically; fetching only the single latest point
+# means a revision to an already-stored period silently never gets corrected.
+STATCAN_LOOKBACK = 4
+
 def fetch_boc(series_id):
     """Get latest observation from BoC Valet."""
     r = requests.get(
@@ -55,11 +60,15 @@ def fetch_boc(series_id):
     
     return obs_date, value
 
-def fetch_statcan(vector_id, table_label):
-    """Get latest observation from StatCan WDS."""
+def fetch_statcan(vector_id, latest_n=STATCAN_LOOKBACK):
+    """
+    Get the latest N observations from StatCan WDS, oldest to newest.
+    Fetching a window (not just the newest point) lets us pick up backward
+    revisions to periods we've already stored, not just brand-new periods.
+    """
     r = requests.post(
         "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods",
-        json=[{"vectorId": vector_id, "latestN": 1}],
+        json=[{"vectorId": vector_id, "latestN": latest_n}],
         timeout=10,
         headers={"Content-Type": "application/json"},
     )
@@ -67,17 +76,11 @@ def fetch_statcan(vector_id, table_label):
     body = r.json()
     
     if not body or body[0].get("status") != "SUCCESS":
-        return None, None
+        return []
     
     obj = body[0]["object"]
     pts = obj.get("vectorDataPoint", [])
-    if not pts:
-        return None, None
-    
-    pt = pts[0]
-    obs_date = pt["refPer"]
-    value = float(pt["value"])
-    return obs_date, value
+    return [(pt["refPer"], float(pt["value"])) for pt in pts]
 
 def upsert_observation(conn, series_key, obs_date, value):
     """Insert or update an observation."""
@@ -140,13 +143,15 @@ def main():
         except Exception as e:
             print(f"  {series_key:<30} ERROR: {e}")
     
-    print(f"\nFetching {len(STATCAN_SERIES)} StatCan series...")
+    print(f"\nFetching {len(STATCAN_SERIES)} StatCan series (last {STATCAN_LOOKBACK} periods each, to catch revisions)...")
     for vector_id, (series_key, table_id, *_) in STATCAN_SERIES.items():
         try:
-            obs_date, value = fetch_statcan(vector_id, table_id)
-            if obs_date and value is not None:
-                upsert_observation(conn, series_key, obs_date, value)
-                print(f"  {series_key:<30} {obs_date} = {value}")
+            points = fetch_statcan(vector_id)
+            if points:
+                for obs_date, value in points:
+                    upsert_observation(conn, series_key, obs_date, value)
+                latest_date, latest_value = points[-1]
+                print(f"  {series_key:<30} {latest_date} = {latest_value}  ({len(points)} periods checked)")
             else:
                 print(f"  {series_key:<30} (no data)")
         except Exception as e:
@@ -158,7 +163,6 @@ def main():
         median_date, median_val = fetch_boc("CPI_MEDIAN")
         if trim_val is not None and median_val is not None:
             avg_val = round((trim_val + median_val) / 2, 3)
-            # use the later of the two dates (should normally match)
             obs_date = max(trim_date, median_date)
             upsert_observation(conn, "ca.inflation.core", obs_date, avg_val)
             print(f"  ca.inflation.core{' ' * 13} {obs_date} = {avg_val}  (trim={trim_val}, median={median_val})")
