@@ -15758,6 +15758,12 @@
       "fetched_at": "2026-08-27T17:27:13.591578Z"
     },
     {
+      "series_key": "us.inflation.pce",
+      "obs_date": "2026-08-01",
+      "value": 131.579,
+      "fetched_at": "2026-10-01T12:42:26.043231Z"
+    },
+    {
       "series_key": "us.inflation.pce.core",
       "obs_date": "1959-01-01",
       "value": 15.501,
@@ -20622,6 +20628,12 @@
       "obs_date": "2026-07-01",
       "value": 130.658,
       "fetched_at": "2026-08-27T17:27:13.359643Z"
+    },
+    {
+      "series_key": "us.inflation.pce.core",
+      "obs_date": "2026-08-01",
+      "value": 130.455,
+      "fetched_at": "2026-10-01T12:42:25.571307Z"
     }
   ]
 }
